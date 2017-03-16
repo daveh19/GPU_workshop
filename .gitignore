@@ -97,3 +97,4 @@ ENV/
 
 # pycharm stuff
 .idea
+logs
