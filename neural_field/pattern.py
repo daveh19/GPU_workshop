@@ -5,11 +5,11 @@ ctx = cl.create_some_context()
 queue = cl.CommandQueue(ctx)
 
 nx =1000
-tmax=50
+tmax=200
 
 x=np.linspace(-np.pi,np.pi,nx,endpoint=False,dtype=np.float32)
 u=np.ones(nx,dtype=np.float32)
-v=np.zeros(nx,dtype=np.float32)
+v=np.ones(nx,dtype=np.float32)
 I=np.zeros(nx,dtype=np.float32)
 time=np.arange(tmax)
 
@@ -35,8 +35,12 @@ v_mat=np.zeros((tmax,nx))
 for t in xrange(tmax):
   prg.pattern(queue, (nx,), None, x_g, u_g, v_g, I_g, res_u_g, res_v_g,np.int32(nx))
 
+  cl.enqueue_copy(queue, u_g, res_u_g)
+  cl.enqueue_copy(queue, v_g, res_v_g)
+
   cl.enqueue_copy(queue, u, res_u_g)
   cl.enqueue_copy(queue, v, res_v_g)
+
 
   u_mat[t,:]=u
   v_mat[t,:]=v
@@ -56,12 +60,12 @@ prg.mytest(queue, (nx,), None, x_g, res_x_g)
 cl.enqueue_copy(queue, res_x, res_x_g)
 
 
-pl.figure()
-pl.plot(x,res_x)
-
-mexfft=abs(np.fft.fft(res_x))
-freqs=np.fft.fftfreq(nx,2*np.pi/nx)
-
-pl.figure()
-pl.plot(freqs,mexfft)
-pl.xlim((-5,5))
+#pl.figure()
+#pl.plot(x,res_x)
+#
+#mexfft=abs(np.fft.fft(res_x))
+#freqs=np.fft.fftfreq(nx,2*np.pi/nx)
+#
+#pl.figure()
+#pl.plot(freqs,mexfft)
+#pl.xlim((-5,5))

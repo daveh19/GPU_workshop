@@ -28,7 +28,7 @@ float F(float u)
 {
   const float u_th=0.05;
   const float r=0.25;
-  const float k=.24;
+  const float k=.26;
 
 
   float df0=r/4.;
@@ -60,9 +60,9 @@ __kernel void pattern(
 {
 
   const float alpha=0.1;
-  const float beta=0.;
+  const float beta=0.125;
   const float tau=1.;
-
+  const float dt=0.1;
 
   int gid = get_global_id(0);
   float u =u_g[gid];
@@ -70,14 +70,13 @@ __kernel void pattern(
   float I =I_g[gid];
 
 
-  res_u_g[gid]=-u-beta*v+I;
   
   float conv=0.;
   for(int i=0;i<nx; i++)
   {
     conv+=F(u_g[i])*w(dist(x_g[gid],x_g[i]));
   }   
-  res_u_g[gid]+=(M_PI_F*2/nx)*conv;
-  res_v_g[gid]=alpha*(u-v);
+  res_u_g[gid]=u+dt*(-u-beta*v+I+(M_PI_F*2/nx)*conv);
+  res_v_g[gid]=v+dt*alpha*(u-v);
 
 }
